@@ -1,0 +1,8 @@
+# Env file
+.env
+
+# pyc files
+*.pyc
+
+# local DB files
+*.sqlite3
