@@ -6,3 +6,5 @@
 
 # local DB files
 *.sqlite3
+
+*.json
