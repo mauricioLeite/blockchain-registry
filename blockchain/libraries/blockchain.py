@@ -18,10 +18,12 @@ class Blockchain:
     def last_block(self):
         return self.chain[-1]
 
+    #   NEW BLOCKS LOGIC
     def proof_of_work(self, block):
+        # TODO: internalize nonce compute
         block.nonce = 0
         computed_hash = block.compute_hash()
-        while not computed_hash.startswith('0' * Blockchain.difficulty):
+        while not computed_hash.startswith("0" * Blockchain.difficulty):
             block.nonce += 1
             computed_hash = block.compute_hash()
         return computed_hash
@@ -37,7 +39,7 @@ class Blockchain:
         return True
  
     def is_valid_proof(self, block, block_hash):
-        return (block_hash.startswith('0' * Blockchain.difficulty) and
+        return (block_hash.startswith("0" * Blockchain.difficulty) and
             block_hash == block.compute_hash())
 
     def add_new_transaction(self, transaction):
@@ -50,7 +52,7 @@ class Blockchain:
         last_block = self.last_block
  
         new_block = Block(index=last_block.index + 1,
-                          data=self.unconfirmed_transactions[0],
+                          transaction=self.unconfirmed_transactions[0],
                           timestamp=time.time(),
                           previous_hash=last_block.hash)
  
@@ -59,3 +61,21 @@ class Blockchain:
         self.unconfirmed_transactions = self.unconfirmed_transactions[1:]
         return new_block.index
         
+    # CONSENSUS LOGIC
+    '''
+        Check if entire Blockchain is valid
+    '''
+    def check_chain_validy(cls, chain):
+        result = True
+        previous_hash = "0"
+
+        for block in chain:
+            block_hash = block.hash
+            delattr(block, "hash")
+
+            if not cls.is_valid_proof(block, block_hash) or previous_hash != block.previous_hash:
+                return False
+                               
+            block.hash, previous_hash = block_hash, block_hash
+
+        return result
