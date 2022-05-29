@@ -123,6 +123,9 @@ class RegisterNodeView(APIView):
             
         return generated_blockchain
 
+"""
+    Sync new block on chain with another registered nodes
+"""
 class BlockSyncView(APIView):
 
     def post(self, request):
