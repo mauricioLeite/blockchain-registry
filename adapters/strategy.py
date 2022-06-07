@@ -13,7 +13,7 @@ class StrategyModel():
     def get(self, where: dict):
         result = self.model.objects.filter(**where).values()
         return result[0] if result else None
-        
+
     def get_all(self):
         blocks = self.model.objects.all().values()
         return list(blocks) if blocks else []
@@ -27,7 +27,7 @@ class StrategyModel():
 
     def insert(self, attrs: dict):
         print(attrs.__dict__, type(attrs.__dict__))
-        new = self.model(**{"block": attrs.__dict__})
+        new = self.model(**attrs.__dict__)
         new.save()
         return self.__clean_result(new)
 
