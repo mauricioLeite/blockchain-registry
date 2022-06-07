@@ -6,8 +6,10 @@ from ..services.registry_service import RegistryService
 from ..services.registry_operations import RegistryOperations
 
 from ..libraries.blockchain import Blockchain
+from adapters.factory import DjangoStorageFactory
 
-blockchain = Blockchain()
+factory = DjangoStorageFactory()
+blockchain = Blockchain(factory)
 peers = set()
 
 # Blockchain Logic Endpoints
