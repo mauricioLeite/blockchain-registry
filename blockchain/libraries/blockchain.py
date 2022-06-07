@@ -1,22 +1,35 @@
 import time
 from .block import Block
 
+from adapters.factory import DjangoStorageFactory
+
 class Blockchain: 
     difficulty = 2
 
-    def __init__(self):
+    def __init__(self, factory: DjangoStorageFactory):
+        self.storage = factory
         self.unconfirmed_transactions = []
-        self.chain = []
-        self.create_genesis_block()
+        # self.chain = []
+        self.__create_genesis_block()
  
-    def create_genesis_block(self):
-        genesis_block = Block(0, [], time.time(), "0")
-        genesis_block.hash = genesis_block.compute_hash()
-        self.chain.append(genesis_block)
+    def __create_genesis_block(self):
+        blocks_model = self.storage.createBlockModels()
+        if blocks_model.count_rows() == 0:
+            genesis_block = Block(0, [], time.time(), "0")
+            genesis_block.hash = genesis_block.compute_hash()
+            self.storage.createBlockModels().insert(genesis_block)
+
+    @property
+    def chain(self):
+        return self.storage.createBlockModels().get_all()
+    
+    @property
+    def get_block(self, id_):
+        return self.storage.createBlockModels().get({"id": id_})
 
     @property
     def last_block(self):
-        return self.chain[-1]
+        return Block(**self.storage.createBlockModels().last()["block"])
 
     #   NEW BLOCKS LOGIC
     def proof_of_work(self, block):
@@ -35,8 +48,7 @@ class Blockchain:
         if not self.is_valid_proof(block, proof):
             return False
         block.hash = proof
-        self.chain.append(block)
-        return True
+        return self.storage.createBlockModels().insert(block)
  
     def is_valid_proof(self, block, block_hash):
         return (block_hash.startswith("0" * Blockchain.difficulty) and
@@ -50,16 +62,15 @@ class Blockchain:
             return False
  
         last_block = self.last_block
- 
         new_block = Block(index=last_block.index + 1,
                           transaction=self.unconfirmed_transactions[0],
                           timestamp=time.time(),
                           previous_hash=last_block.hash)
  
         proof = self.proof_of_work(new_block)
-        self.add_block(new_block, proof)
+        id_ = self.add_block(new_block, proof)
         self.unconfirmed_transactions = self.unconfirmed_transactions[1:]
-        return new_block.index
+        return id_
         
     # CONSENSUS LOGIC
     '''
