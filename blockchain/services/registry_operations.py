@@ -11,12 +11,9 @@ class RegistryOperations:
 
     def list(self, id_: Union[str, int] = None):
         if id_:
-            return [self.__blockchain.chain[id_].__dict__]
+            return self.__blockchain.get_block(id_)
 
-        chain = []
-        for block in self.__blockchain.chain:
-            chain.append(block.__dict__)
-        return chain
+        return self.__blockchain.chain
 
     def insert_new_block(self, data: dict):
         self.__blockchain.add_new_transaction(data)
@@ -26,10 +23,10 @@ class RegistryOperations:
         mined_block_id = self.__blockchain.mine()
         if not mined_block_id: return None
 
-        chain_length = len(self.__blockchain.chain)
-        self.consensus()
-        if chain_length == len(self.__blockchain.chain):
-            self.announce_new_block(self.__blockchain.last_block)
+        # chain_length = len(self.__blockchain.chain)
+        # self.consensus()
+        # if chain_length == len(self.__blockchain.chain):
+        #     self.announce_new_block(self.__blockchain.last_block)
         
         return self.__blockchain.last_block.__dict__
 
