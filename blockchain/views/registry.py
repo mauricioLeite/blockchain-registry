@@ -110,15 +110,12 @@ class RegisterNodeView(APIView):
         
         for idx, block_data in enumerate(chain_dump):
             if idx == 0:
-                generated_blockchain.last_block.timestamp = block_data.get("timestamp")
+                generated_blockchain.last_block.cleated_at = block_data.get("created_at")
                 generated_blockchain.last_block.hash = block_data.get("hash")
             else:
-                block = Block(block_data["index"],
-                            block_data["transaction"],
-                            block_data["timestamp"],
-                            block_data["previous_hash"],
-                            block_data["nonce"])
                 proof = block_data['hash']
+                del block_data['hash']
+                block = Block(**block_data)
                 added = generated_blockchain.add_block(block, proof)
                 if not added:
                     raise Exception("The chain dump is tampered!!")
@@ -134,7 +131,7 @@ class BlockSyncView(APIView):
         payload = request.data
         logging.info(json.dumps({ "payload": payload, "class": "BlockSync"}, ensure_ascii=False))
         
-        block = Block(payload.get("index"), payload.get("transaction"), payload.get("timestamp"), payload.get("previous_hash"), payload.get("nonce"))
+        block = Block(payload.get("index"), payload.get("transaction"), payload.get("created_at"), payload.get("previous_hash"), payload.get("nonce"))
 
         proof = payload.get("hash")
         added = blockchain.add_block(block, proof)

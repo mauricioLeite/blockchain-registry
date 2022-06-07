@@ -29,7 +29,7 @@ class Blockchain:
 
     @property
     def last_block(self):
-        return Block(**self.storage.createBlockModels().last()["block"])
+        return Block(**self.storage.createBlockModels().last())
 
     #   NEW BLOCKS LOGIC
     def proof_of_work(self, block):
@@ -64,7 +64,6 @@ class Blockchain:
         last_block = self.last_block
         new_block = Block(index=last_block.index + 1,
                           transaction=self.unconfirmed_transactions[0],
-                          timestamp=time.time(),
                           previous_hash=last_block.hash)
  
         proof = self.proof_of_work(new_block)
