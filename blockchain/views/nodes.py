@@ -4,7 +4,6 @@ from rest_framework.views import APIView
 
 
 from ..services.registry_service import RegistryService
-from ..services.registry_operations import RegistryOperations
 
 from blockchain.libraries.peers_manager import PeersManager
 from ..libraries.blockchain import Blockchain
@@ -34,7 +33,6 @@ class NewNodeView(APIView):
         #TODO: COMUNICATE NEW NODE TO PEERS
         factory.createPeersModel().insert({ "ip_address": addr })
         print(payload)
-        operations = RegistryOperations(blockchain)
         return RegistryService(operations, factory).list()
 
 import requests

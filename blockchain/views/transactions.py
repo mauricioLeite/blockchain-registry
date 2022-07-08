@@ -4,7 +4,6 @@ from rest_framework.views import APIView
 
 
 from ..services.registry_service import RegistryService
-from ..services.registry_operations import RegistryOperations
 
 from blockchain.libraries.peers_manager import PeersManager
 from ..libraries.blockchain import Blockchain
@@ -14,14 +13,14 @@ factory = DjangoStorageFactory()
 blockchain = Blockchain(factory)
 peers = PeersManager(factory)
 
-class PendingView(APIView):
+class TransactionsView(APIView):
 
     def get(self, _):        
-        operations = RegistryOperations(blockchain, storage=factory)
-        return RegistryService(operations).pending()
+        return RegistryService().pending()
 
-class MineView(APIView):
+    def post(self, request, id_=None):
+        payload = request.data
+        logging.info(json.dumps({ "payload": payload }, ensure_ascii=False))
+        
+        return RegistryService().insert_registry(payload)
 
-    def get(self, _):
-        operations = RegistryOperations(blockchain, factory)
-        return RegistryService(operations).mine()
