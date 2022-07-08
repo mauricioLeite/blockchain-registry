@@ -20,7 +20,6 @@ class Blockchain:
                 del reference["id"]
                 genesis_block = Block(**reference)
             self.storage.createBlockModels().insert(genesis_block.__dict__)
-            
 
     @property
     def chain(self):
@@ -33,10 +32,6 @@ class Blockchain:
     def get_block(self, id_: int):
         block = self.storage.createBlockModels().get({"index": id_})
         return block if block else []
-
-    # New transaction logic
-    def add_new_transaction(self, transaction: dict):
-        self.storage.createPendingTransactionsModel().insert({ "transaction": transaction })
 
     #   NEW BLOCKS LOGIC
     def mine(self, unconfirmed_transaction: dict):
