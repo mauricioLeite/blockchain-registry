@@ -1,4 +1,3 @@
-from re import L
 from django.db import models
 
 # Create your models here.
@@ -14,3 +13,6 @@ class Blocks(models.Model):
 class PendingTransactions(models.Model):
     transaction = models.JSONField(blank=False, null=False)
     created_at = models.DateTimeField(auto_now_add=True)
+
+class Peers(models.Model):
+    ip_address = models.CharField(blank=False, null=False, max_length=30)
