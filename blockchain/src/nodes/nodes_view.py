@@ -2,41 +2,25 @@ import json, logging
 
 from rest_framework.views import APIView
 
-
-from ..src.registry.registry_service import RegistryService
-
-from blockchain.libraries.peers_manager import PeersManager
-from ..libraries.blockchain import Blockchain
 from adapters.factory import DjangoStorageFactory
+from blockchain.libraries.factory import LibraryFactory
+from blockchain.src.nodes.nodes_service import NodeService
 
-factory = DjangoStorageFactory()
-blockchain = Blockchain(factory)
-peers = PeersManager(factory)
+storage = DjangoStorageFactory()
+library = LibraryFactory()
 
 # TODO: Test all code below :\ 
 from rest_framework.response import Response
 from rest_framework import status
-# Nodes Logic Endpoints
-"""
-    Register external node on existing network
-"""
+
 class NewNodeView(APIView):
 
     def post(self, request):
         payload = request.data
         logging.info(json.dumps({ "payload": payload }, ensure_ascii=False))
+        return NodeService(storage, library).new_node(payload)
 
-        addr = payload.get("node_address")
-        if not addr:
-            return Response({"message": "Missing node_address field!"}, status.HTTP_400_BAD_REQUEST)
-        
-        #TODO: COMUNICATE NEW NODE TO PEERS
-        factory.createPeersModel().insert({ "ip_address": addr })
-        print(payload)
-        return RegistryService(operations, factory).list()
-
-import requests
-from ..libraries.block import Block
+from ...libraries.block import Block
 """
     Internally calls the `register_node` endpoint to
     register current node with the remote node specified in the

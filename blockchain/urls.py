@@ -3,7 +3,7 @@ from django.urls import path
 from blockchain.src.registry.registry_view import RegistryView
 from blockchain.src.transactions.transactions_view import  TransactionsView
 from blockchain.src.mine.mine_view import MineView
-from blockchain.views.nodes import NewNodeView, RegisterNodeView, BlockSyncView
+from blockchain.src.nodes.nodes_view import NewNodeView, RegisterNodeView, BlockSyncView
 
 urlpatterns = [
     path("registry/", RegistryView.as_view()),
