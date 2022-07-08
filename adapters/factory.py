@@ -1,5 +1,6 @@
 from .orm.block_orm import BlocksORM
 from .orm.pending_transactions_orm import PendingTransactionsORM
+from .orm.peers_orm import PeersORM
 
 from .strategy import StrategyModel
 
@@ -10,5 +11,8 @@ class DjangoStorageFactory():
     def createBlockModels(self) -> StrategyModel:
         return StrategyModel(BlocksORM)
 
-    def createEntitiesModel(self) -> StrategyModel:
+    def createPendingTransactionsModel(self) -> StrategyModel:
         return StrategyModel(PendingTransactionsORM)
+
+    def createPeersModel(self) -> StrategyModel:
+        return StrategyModel(PeersORM)
