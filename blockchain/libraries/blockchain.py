@@ -38,16 +38,18 @@ class Blockchain:
         del unconfirmed_transaction["created_at"]
         last_block = self.last_block
         
-        new_block = Block(index=last_block["index"] + 1,
-                          transaction=unconfirmed_transaction,
-                          previous_hash=last_block["hash"])
+        new_block = Block(
+            index=last_block["index"] + 1,
+            transaction=unconfirmed_transaction,
+            previous_hash=last_block["hash"]
+        )
 
-        proof = self.proof_of_work(new_block)
+        proof = self.__proof_of_work(new_block)
         id_ = self.add_block(new_block, proof)
         return id_, unconfirmed_transaction["id"]
 
 
-    def proof_of_work(self, block: Block):
+    def __proof_of_work(self, block: Block):
         # TODO: internalize nonce compute
         block.nonce = 0
         computed_hash = block.compute_hash()
@@ -63,6 +65,7 @@ class Blockchain:
 
         if not self.is_valid_proof(block, proof):
             return False
+
         block.hash = proof
         return self.storage.createBlockModels().insert(block.__dict__)
  
