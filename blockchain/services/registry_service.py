@@ -4,32 +4,21 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from adapters.factory import DjangoStorageFactory
+from blockchain.libraries.factory import LibraryFactory
 
-from .registry_operations import RegistryOperations
 class RegistryService:
 
-    def __init__(self, operations: RegistryOperations, storage: DjangoStorageFactory) -> None:
-        self.__operations = operations
+    def __init__(self, storage: DjangoStorageFactory, library: LibraryFactory) -> None:
         self.storage = storage
+        self.library = library
         
     def list(self, id_: Union[str,int] = None):
-        chain, peers = self.__operations.list(id_)
+        peers = self.library.createPeersManager().list()
+        blockchain = self.library.createBlockchain()
+        if id_:
+            chain = blockchain.get_block(id_)
+        else:
+            chain = blockchain.chain
         return Response({"chain": chain, "peers": peers, "length": len(chain)}, status.HTTP_200_OK)
 
-    def insert_registry(self, payload: dict) -> Response:
-        # TODO: Need validation on payload strucuture
-        confirm = self.__operations.insert_new_block(payload)
-        if confirm:
-            return Response({"message":"Transaction requested!"}, status.HTTP_201_CREATED)
-        return Response({"message":"Internal Error"}, status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-    def pending(self):
-        pending_tx = self.__operations.pending_transactions()
-        return Response({"unconfirmed_transactions": pending_tx, "length": len(pending_tx)}, status.HTTP_200_OK)
-
-    def mine(self):
-        # TODO: verify existence of pending transactions
-        block = self.__operations.mine()
-        if not block: return Response({"message": "No transaction to mine."}, status.HTTP_200_OK)
-        
-        return Response({"block": block}, status.HTTP_200_OK)
+    
