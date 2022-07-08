@@ -1,6 +1,8 @@
 from django.urls import path 
 
-from .views.registry import RegistryView, PendingView, MineView, NewNodeView, RegisterNodeView, BlockSyncView
+from blockchain.views.registry import RegistryView
+from blockchain.views.transactions import  PendingView, MineView
+from blockchain.views.nodes import NewNodeView, RegisterNodeView, BlockSyncView
 
 urlpatterns = [
     path("registry/", RegistryView.as_view()),
