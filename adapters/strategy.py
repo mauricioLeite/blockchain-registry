@@ -18,18 +18,27 @@ class StrategyModel():
         blocks = self.model.objects.all().values()
         return list(blocks) if blocks else []
     
+    def first(self):
+        result =  self.model.objects.first()
+        return self.__clean_result(result) if result else result
+
     def last(self):
         result =  self.model.objects.last()
-        return self.__clean_result(result)
+        return self.__clean_result(result) if result else result
 
     def count_rows(self):
         return self.model.objects.count()
 
     def insert(self, attrs: dict):
-        print(attrs.__dict__, type(attrs.__dict__))
-        new = self.model(**attrs.__dict__)
+        new = self.model(**attrs)
         new.save()
         return self.__clean_result(new)
+
+    def delete(self, where: dict = None):
+        result = self.__evaluate_conditions(where).delete()
+        if isinstance(result, tuple):
+            return result[0]
+        return result
 
     def __clean_result(self, result):
         result = result.__dict__
@@ -42,9 +51,9 @@ class StrategyModel():
     #     result = self._query_values(queryset, select, **kwargs)
     #     return list(result) if result else []
 
-    def get(self, where: dict = {}, select: list = None, **kwargs) -> Union[dict, None]:
-        element = self.get_all(where, select, **kwargs)
-        return element[0] if element else None
+    # def get(self, where: dict = {}, select: list = None, **kwargs) -> Union[dict, None]:
+    #     element = self.get_all(where, select, **kwargs)
+    #     return element[0] if element else None
 
     # def insert(self, attrs: Union[list, dict]) -> dict:
     #     if isinstance(attrs, dict):
@@ -60,15 +69,15 @@ class StrategyModel():
     # def count_rows(self, where: dict) -> Union[dict, None]:
     #     return self.__evaluate_conditions(where).count()
 
-    def delete(self, where: dict) -> Union[dict, None]:
-        if hasattr(self.model, 'SOFT_DELETE') and self.model.SOFT_DELETE:
-            result = self.update(where, { "deleted_at": datetime.now() })
-        else:
-            result = self.__evaluate_conditions(where).delete()
+    # def delete(self, where: dict) -> Union[dict, None]:
+    #     if hasattr(self.model, 'SOFT_DELETE') and self.model.SOFT_DELETE:
+    #         result = self.update(where, { "deleted_at": datetime.now() })
+    #     else:
+    #         result = self.__evaluate_conditions(where).delete()
         
-        if isinstance(result, tuple):
-            return result[0]
-        return result
+    #     if isinstance(result, tuple):
+    #         return result[0]
+    #     return result
 
     def increment_field(self, where: dict, field: str, increment: int = 1) -> bool:
         try:
@@ -114,22 +123,24 @@ class StrategyModel():
     def _setup_where(self, where: dict) -> dict:
         conditions = {"where":{}, "exclude":{}}
 
-        for key, value in where.items():
-            op = "where"
-            multi_cond = isinstance(value, list) and len(value) > 1 and isinstance(value[0], tuple)
-            
-            if multi_cond:
-                for el in value:
-                    op, m_key, value = self.__get_operation(key, el)
-                    conditions[op][m_key] = value
-                continue
+        if where:
+            for key, value in where.items():
+                op = "where"
+                multi_cond = isinstance(value, list) and len(value) > 1 and isinstance(value[0], tuple)
+                
+                if multi_cond:
+                    for el in value:
+                        op, m_key, value = self.__get_operation(key, el)
+                        conditions[op][m_key] = value
+                    continue
 
-            if isinstance(value, tuple):
-                op, key, value = self.__get_operation(key, value)
+                if isinstance(value, tuple):
+                    op, key, value = self.__get_operation(key, value)
 
-            key = f"{key}__in" if isinstance(value, list) and not multi_cond else key
+                key = f"{key}__in" if isinstance(value, list) and not multi_cond else key
+                
+                conditions[op][key] = value
             
-            conditions[op][key] = value
         return conditions["where"], conditions["exclude"]
     
     def __get_operation(self, key: str, value: tuple) -> tuple:
