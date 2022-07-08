@@ -31,7 +31,7 @@ class Blockchain:
         return self.storage.createBlockModels().last()
         
     def get_block(self, id_: int):
-        block = self.storage.createBlockModels().get({"id": id_})
+        block = self.storage.createBlockModels().get({"index": id_})
         return block if block else []
 
     # New transaction logic
