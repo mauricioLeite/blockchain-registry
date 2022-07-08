@@ -3,7 +3,7 @@ import json, logging
 from rest_framework.views import APIView
 
 from adapters.factory import DjangoStorageFactory
-from blockchain.components.transactions.transactions_service import TransactionsService
+from blockchain.src.transactions.transactions_service import TransactionsService
 
 storage = DjangoStorageFactory()
 

@@ -1,7 +1,7 @@
 from django.urls import path 
 
-from blockchain.components.registry.registry_view import RegistryView
-from blockchain.components.transactions.transactions_view import  TransactionsView
+from blockchain.src.registry.registry_view import RegistryView
+from blockchain.src.transactions.transactions_view import  TransactionsView
 from blockchain.views.mine import MineView
 from blockchain.views.nodes import NewNodeView, RegisterNodeView, BlockSyncView
 

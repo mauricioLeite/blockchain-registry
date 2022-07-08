@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 
 from adapters.factory import DjangoStorageFactory
 
-from blockchain.components.registry.registry_service import RegistryService
+from blockchain.src.registry.registry_service import RegistryService
 from blockchain.libraries.factory import LibraryFactory
 
 storage = DjangoStorageFactory()
