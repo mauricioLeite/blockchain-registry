@@ -3,16 +3,18 @@ from typing import Union
 from rest_framework.response import Response
 from rest_framework import status
 
+from adapters.factory import DjangoStorageFactory
+
 from .registry_operations import RegistryOperations
 class RegistryService:
 
-    def __init__(self, operations: RegistryOperations, peers: list = None) -> None:
+    def __init__(self, operations: RegistryOperations, storage: DjangoStorageFactory) -> None:
         self.__operations = operations
-        self.__peers = peers
+        self.storage = storage
         
     def list(self, id_: Union[str,int] = None):
-        chain = self.__operations.list(id_)
-        return Response({"chain": chain, "peers": self.__peers, "length": len(chain)}, status.HTTP_200_OK)
+        chain, peers = self.__operations.list(id_)
+        return Response({"chain": chain, "peers": peers, "length": len(chain)}, status.HTTP_200_OK)
 
     def insert_registry(self, payload: dict) -> Response:
         # TODO: Need validation on payload strucuture
