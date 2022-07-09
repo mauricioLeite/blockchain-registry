@@ -12,7 +12,8 @@ class PeersManager:
             formatted.append(peer["ip_address"])
         return formatted
 
-    def sync_peers(self, peers: list):
+    def sync_peers(self, peers: list, host: str):
         for peer in peers:
-            self.storage.createPeersModel().insert({ 'ip_address': peer })
+            if peer != host:
+                self.storage.createPeersModel().insert({ 'ip_address': peer })
         return True
