@@ -93,7 +93,6 @@ class Blockchain:
 
         return result
 
-
     # Sync new node
     def create_chain_from_dump(self, chain_dump):
         #TODO: implement chain roolback
@@ -106,9 +105,10 @@ class Blockchain:
             if block_data["index"] == 0:
                 self.__create_genesis_block(block_data)
             else:
-                del block_data["id"]
                 proof = block_data['hash']
-                del block_data['hash']
+                for key in ['id', 'hash', 'created_at']:
+                    del block_data[key]
+
                 block = Block(**block_data)
                 added = self.add_block(block, proof)
                 if not added:
