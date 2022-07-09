@@ -7,12 +7,13 @@ from blockchain.libraries.factory import LibraryFactory
 from blockchain.src.nodes.nodes_service import NodeService
 
 storage = DjangoStorageFactory()
-library = LibraryFactory()
+library = LibraryFactory(storage)
 
 # TODO: Test all code below :\ 
 from rest_framework.response import Response
 from rest_framework import status
 
+# Register external node on network
 class NewNodeView(APIView):
 
     def post(self, request):
@@ -20,41 +21,23 @@ class NewNodeView(APIView):
         logging.info(json.dumps({ "payload": payload }, ensure_ascii=False))
         return NodeService(storage, library).new_node(payload)
 
+#TODO: remove class after tests
+class ClearLocalPeers(APIView):
+
+    def get(self, request):
+        logging.info(json.dumps({ "message": "Clear request received!" }, ensure_ascii=False))
+        return NodeService(storage, library).clear_local()
+
+
 from ...libraries.block import Block
-"""
-    Internally calls the `register_node` endpoint to
-    register current node with the remote node specified in the
-    request, and sync the blockchain as well with the remote node.
-"""
-class RegisterNodeView(APIView):
+# Joinf network based on reference node received
+class JoinView(APIView):
 
     def post(self, request):
-        url = request.get_host()
         payload = request.data
-        logging.info(json.dumps({ "payload": payload, "url": url }, ensure_ascii=False))
-
-        addr = payload.get("node_address")
-        # if not addr:
-        #     return Response({"message": "Missing node_address field!"}, status.HTTP_400_BAD_REQUEST)
-
-        data = {"node_address": url}
-        headers = {'Content-Type': "application/json"}
-
-        # Make a request to register with remote node and obtain information
-        # response = requests.post(f"http://{addr}/register_node/", data=json.dumps(data), headers=headers)
-        #TODO: ADJUST TO SUPPORT DATABASE
-        # if response.status_code == 200:
-        if 200 == 200:
-            # update chain and the peers
-            blockchain.create_chain_from_dump(payload['chain'])
-            #nesse nó ou em um novo nó DESENHAR!
-            peers.sync_peers([addr, *payload['peers']])
-
-            return Response({"message":"Registration successful"}, status.HTTP_200_OK)
-        else:
-            # if something goes wrong, pass it on to the API response
-            # return Response({"message": response.content}, response.status_code)
-            return Response({"message": "hy"}, 400)
+        host = request.get_host()
+        logging.info(json.dumps({ "payload": payload, "host": host }, ensure_ascii=False))
+        return NodeService(storage, library).join_network(payload, host)
     
 """
     Sync new block on chain with another registered nodes

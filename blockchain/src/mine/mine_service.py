@@ -29,7 +29,7 @@ class MineService():
         block = blockchain.last_block
         return Response({"block": block}, status.HTTP_200_OK)
 
-
+    #TODO: implements nodes communication on library
     def consensus(self):
         """
         Our simple consensus algorithm. If a longer valid chain is
