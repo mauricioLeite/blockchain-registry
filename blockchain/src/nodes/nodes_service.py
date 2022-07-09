@@ -1,4 +1,4 @@
-import requests
+import requests, json
 
 from rest_framework.response import Response
 from rest_framework import status
@@ -33,18 +33,17 @@ class NodeService():
 
         # Make a request to register with remote node and obtain information
         response = requests.post(f"http://{addr}/register_node/", data=json.dumps(data), headers=headers)
-        #TODO: ADJUST TO SUPPORT DATABASE
         if response.status_code == 200:
+            payload = response.json()
             # update chain and the peers
             self.library.createBlockchain().create_chain_from_dump(payload['chain'])
-            #nesse nó ou em um novo nó DESENHAR!
-            self.library.createPeersManager().sync_peers([addr, *payload['peers']])
+            # #nesse nó ou em um novo nó DESENHAR!
+            self.library.createPeersManager().sync_peers([addr, *payload['peers']], host)
 
             return Response({"message":"Registration successful"}, status.HTTP_200_OK)
         else:
-            # if something goes wrong, pass it on to the API response
-            # return Response({"message": response.content}, response.status_code)
-            return Response({"message": "hy"}, 400)
+            
+            return Response({"message": "Error registering node in network."}, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     #TODO: remove method after tests
     def clear_local(self):
