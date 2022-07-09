@@ -29,7 +29,7 @@ SECRET_KEY = 'django-insecure-2wuu887$ejg7r@=n!nx463b+-ej)_w_si0*#%t8c9er8wu)@p$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False if environ['ENVIRONMENT'] == 'production' else True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [environ["BLOCKCHAIN_HOST"]]
 
 
 # Application definition
