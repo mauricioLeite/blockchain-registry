@@ -1,4 +1,4 @@
-import requests
+import requests, json
 
 from rest_framework.response import Response
 from rest_framework import status
@@ -22,42 +22,36 @@ class MineService():
         if not mined_block_id: return  Response({"message": "Error on mining process."}, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         chain_length = len(blockchain.chain)
-        # self.consensus()
+        self.consensus()
         if chain_length == len(blockchain.chain):
-            # self.announce_new_block(blockchain.last_block)
+            self.__announce_new_block(blockchain.last_block)
             self.storage.createPendingTransactionsModel().delete({ "id": transaction["id"] })
-        block = blockchain.last_block
-        return Response({"block": block}, status.HTTP_200_OK)
+
+        return Response({"block": blockchain.last_block}, status.HTTP_200_OK)
 
     #TODO: implements nodes communication on library
     def consensus(self):
-        """
-        Our simple consensus algorithm. If a longer valid chain is
-        found, our chain is replaced with it.
-        """
         longest_chain = None
-        current_len = len(self.__blockchain.chain)
+        current_len = len(self.library.createBlockchain().chain)
         peers = self.storage.createPeersModel().get_all()
-        for _, node in peers.items():
-            response = requests.get(f"http://{node}/registry")
+        for node in peers:
+            print(f"node -- {node['ip_address']}")
+            response = requests.get(f"http://{node['ip_address']}/registry")
             length = response.json()['length']
             chain = response.json()['chain']
-            if length > current_len and self.__blockchain.check_chain_validity(chain):
+            print(f"chain length - {length}")
+            if length > current_len and self.library.createBlockchain().check_chain_validity(chain):
                 # Longer valid chain found!
                 current_len = length
                 longest_chain = chain
         if longest_chain:
-            self.__blockchain = longest_chain
-            return True
+            self.library.createBlockchain().create_chain_from_dump(longest_chain)
 
-        return False
+        return 
 
-    def announce_new_block(self, block):
-        """
-        A function to announce to the network once a block has been mined.
-        Other blocks can simply verify the proof of work and add it to their
-        respective chains.
-        """
+    def __announce_new_block(self, block: dict):
+        if 'created_at' in block: del block['created_at']
+
         peers = self.storage.createPeersModel().get_all()
-        for _, node in peers.items():
-            requests.post(f"http://{node}/sync_block/", json=block)
+        for node in peers:
+            requests.post(f"http://{node['ip_address']}/sync_block/", json=json.dumps(block))
