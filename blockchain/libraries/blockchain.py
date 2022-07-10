@@ -78,28 +78,23 @@ class Blockchain:
     '''
         Check if entire Blockchain is valid
     '''
-    def check_chain_validy(cls, chain):
-        result = True
-        previous_hash = "0"
+    def check_chain_validity(self, chain: dict):
+        previous_hash = self.get_block(0)["hash"]
+        for idx, block in enumerate(chain):
+            if block["index"] == 0: continue
+            block_hash = block['hash']
+            for key in ['id', 'hash', 'created_at']:
+                del block[key]
 
-        for block in chain:
-            block_hash = block.hash
-            delattr(block, "hash")
-
-            if not cls.is_valid_proof(block, block_hash) or previous_hash != block.previous_hash:
+            if not self.is_valid_proof(Block(**block), block_hash) or previous_hash != block['previous_hash']:
                 return False
-                               
-            block.hash, previous_hash = block_hash, block_hash
-
-        return result
+            block['hash'], previous_hash = block_hash, block_hash
+        return True
 
     # Sync new node
-    def create_chain_from_dump(self, chain_dump):
-        #TODO: implement chain roolback
-        before = self.storage.createBlockModels().get_all()
+    def create_chain_from_dump(self, chain_dump: dict):
+        #TODO: implement chain rollback
         self.storage.createBlockModels().delete()
-        after = self.storage.createBlockModels().get_all()
-        print(f"before: {len(before)} --- after: {len(after)}")
         
         for block_data in chain_dump:
             if block_data["index"] == 0:
@@ -107,7 +102,7 @@ class Blockchain:
             else:
                 proof = block_data['hash']
                 for key in ['id', 'hash', 'created_at']:
-                    del block_data[key]
+                    if key in block_data: del block_data[key]
 
                 block = Block(**block_data)
                 added = self.add_block(block, proof)
