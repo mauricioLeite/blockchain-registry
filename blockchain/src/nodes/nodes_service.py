@@ -32,7 +32,7 @@ class NodeService():
         headers = {'Content-Type': "application/json"}
 
         # Make a request to register with remote node and obtain information
-        response = requests.post(f"http://{addr}/node/register/", data=json.dumps(data), headers=headers)
+        response = requests.post(f"http://{addr}/node/register", data=json.dumps(data), headers=headers)
         if response.status_code == 200:
             payload = response.json()
             # update chain and the peers
@@ -42,7 +42,6 @@ class NodeService():
 
             return Response({"message":"Registration successful"}, status.HTTP_200_OK)
         else:
-            
             return Response({"message": "Error registering node in network."}, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     #TODO: remove method after tests

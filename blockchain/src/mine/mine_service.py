@@ -54,4 +54,4 @@ class MineService():
 
         peers = self.storage.createPeersModel().get_all()
         for node in peers:
-            requests.post(f"http://{node['ip_address']}/node/sync_block/", json=json.dumps(block))
+            requests.post(f"http://{node['ip_address']}/node/sync_block", json=json.dumps(block))

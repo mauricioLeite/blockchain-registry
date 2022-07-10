@@ -30,7 +30,7 @@ class ClearLocalPeers(APIView):
 
 
 from ...libraries.block import Block
-# Joinf network based on reference node received
+# Join network based on reference node received
 class JoinView(APIView):
 
     def post(self, request):
