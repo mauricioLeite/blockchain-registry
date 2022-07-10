@@ -13,9 +13,9 @@ urlpatterns = [
     
     path("mine/", MineView.as_view()),
 
-    path("register_node/", NewNodeView.as_view()),
-    path("register_with/", JoinView.as_view()),
-    path("sync_block/", BlockSyncView.as_view()),
+    path("node/register", NewNodeView.as_view()),
+    path("node/join", JoinView.as_view()),
+    path("node/sync_block", BlockSyncView.as_view()),
 
     #TODO: remove path after tests
     path("clear_peers/", ClearLocalPeers.as_view()),
