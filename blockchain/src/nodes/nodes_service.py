@@ -48,5 +48,6 @@ class NodeService():
     #TODO: remove method after tests
     def clear_local(self):
         self.storage.createPeersModel().delete()
+        self.storage.createBlockModels().delete()
         return  Response({"message": "Clear complete!"}, status.HTTP_200_OK)
         
