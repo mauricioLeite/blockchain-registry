@@ -6,6 +6,7 @@ from rest_framework import status
 from adapters.factory import DjangoStorageFactory
 from blockchain.libraries.factory import LibraryFactory
 from blockchain.src.registry.registry_service import RegistryService
+from blockchain.libraries.block import Block
 
 class NodeService():
     
@@ -43,6 +44,18 @@ class NodeService():
             return Response({"message":"Registration successful"}, status.HTTP_200_OK)
         else:
             return Response({"message": "Error registering node in network."}, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def sync_block(self, block: dict):
+        proof = block['hash']
+        for key in ['id', 'hash', 'created_at']:
+            if key in block: del block[key]
+
+        block = Block(**block)
+        added = self.library.createBlockchain().add_block(block, proof)
+
+        if not added: return Response({"message":"The block is discarded by the node."}, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response({"message": "Block added to the chain"}, status.HTTP_201_CREATED)
 
     #TODO: remove method after tests
     def clear_local(self):
