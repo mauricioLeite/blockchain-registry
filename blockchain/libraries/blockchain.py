@@ -35,20 +35,19 @@ class Blockchain:
 
     #   NEW BLOCKS LOGIC
     def mine(self, unconfirmed_transaction: dict):
-        del unconfirmed_transaction["created_at"]
         last_block = self.last_block
         
         new_block = Block(
             index=last_block["index"] + 1,
-            transaction=unconfirmed_transaction,
+            transaction=unconfirmed_transaction.get("transaction"),
             previous_hash=last_block["hash"]
         )
 
         proof = self.__proof_of_work(new_block)
         id_ = self.add_block(new_block, proof)
-        return id_, unconfirmed_transaction["id"]
+        return id_
 
-
+    #TODO: pass block as dict as parameter
     def __proof_of_work(self, block: Block):
         # TODO: internalize nonce compute
         block.nonce = 0
@@ -58,7 +57,8 @@ class Blockchain:
             computed_hash = block.compute_hash()
         return computed_hash
 
-    def add_block(self, block, proof):
+    #TODO: pass block as dict as parameter
+    def add_block(self, block: Block, proof: str):
         previous_hash = self.last_block["hash"]
         if previous_hash != block.previous_hash:
             return False
@@ -69,7 +69,7 @@ class Blockchain:
         block.hash = proof
         return self.storage.createBlockModels().insert(block.__dict__)
  
-    def is_valid_proof(self, block, block_hash):
+    def is_valid_proof(self, block: Block, block_hash: str):
         return (block_hash.startswith("0" * Blockchain.difficulty) and
             block_hash == block.compute_hash())
 
