@@ -12,5 +12,5 @@ library = LibraryFactory(storage)
 class MineView(APIView):
 
     def get(self, request: HttpRequest):
-        logging.info(json.dumps("Mining request.", ensure_ascii=False))
+        logging.info(json.dumps({ "class": "ClearLocalPeers" , "message": "Mining request." }, ensure_ascii=False))
         return MineService(storage, library).mine()

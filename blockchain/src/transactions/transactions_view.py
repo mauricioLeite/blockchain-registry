@@ -13,7 +13,7 @@ class TransactionsView(APIView):
 
     def post(self, request, id_=None):
         payload = request.data
-        logging.info(json.dumps({ "payload": payload }, ensure_ascii=False))
+        logging.info(json.dumps({ "class": "TransactionsView" , "payload": payload }, ensure_ascii=False))
         
         return TransactionsService(storage).create(payload)
 

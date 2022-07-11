@@ -14,6 +14,6 @@ class RegistryView(APIView):
 
     def get(self, _, id_ = None):
         payload = {"registry_id": id_}
-        logging.info(json.dumps({ "payload": payload }, ensure_ascii=False))
+        logging.info(json.dumps({ "class": "RegistryView" , "payload": payload }, ensure_ascii=False))
         
         return RegistryService(storage, library).list(id_)
