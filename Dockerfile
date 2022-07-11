@@ -16,6 +16,7 @@ RUN set -eu; \
         tini \
         libzbar-dev \
         g++ \
+        sqlite3 \
         curl \
 # Install mysqlclient and gcc libs
         default-libmysqlclient-dev \
