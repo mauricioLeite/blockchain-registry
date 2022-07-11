@@ -18,7 +18,6 @@ class MineService():
         
         blockchain = self.library.createBlockchain()
         mined_block_id = blockchain.mine(transaction)
-        print(f"block id: {mined_block_id}")
         if not mined_block_id: return  Response({"message": "Error on mining process."}, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         chain_length = len(blockchain.chain)
@@ -35,11 +34,9 @@ class MineService():
         current_len = len(self.library.createBlockchain().chain)
         peers = self.storage.createPeersModel().get_all()
         for node in peers:
-            print(f"node -- {node['ip_address']}")
             response = requests.get(f"http://{node['ip_address']}/registry")
             length = response.json()['length']
             chain = response.json()['chain']
-            print(f"chain length - {length}")
             if length > current_len and self.library.createBlockchain().check_chain_validity(chain):
                 # Longer valid chain found!
                 current_len = length
@@ -51,7 +48,6 @@ class MineService():
 
     def __announce_new_block(self, block: dict):
         if 'created_at' in block: del block['created_at']
-
         peers = self.storage.createPeersModel().get_all()
         for node in peers:
             requests.post(f"http://{node['ip_address']}/node/sync_block", json=json.dumps(block))
