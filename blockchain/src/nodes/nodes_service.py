@@ -20,7 +20,7 @@ class NodeService():
         if not addr:
             return Response({"message": "Missing node_address field!"}, status.HTTP_400_BAD_REQUEST)
         
-        #TODO: COMUNICATE NEW NODE TO PEERS
+        #TODO: check if node exist before insert and communicate new nodes to peers
         self.storage.createPeersModel().insert({ "ip_address": addr })
         return RegistryService(self.storage, self.library).list()
 
