@@ -9,10 +9,6 @@ from blockchain.src.nodes.nodes_service import NodeService
 storage = DjangoStorageFactory()
 library = LibraryFactory(storage)
 
-# TODO: Test all code below :\ 
-from rest_framework.response import Response
-from rest_framework import status
-
 # Register external node on network
 class NewNodeView(APIView):
 
