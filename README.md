@@ -3,6 +3,10 @@
 
 Simple Blockchain implementation using as cryptographic proof the Proof-of-Work (PoW) and as consensus the longest valid chain.
 
+## Prerequisites
+   - Docker should be installed (version 20.10.17 is used on tests).
+   - Docker Compose should be installed (version 1.29.2 is used on tests).
+
 ## Running
 
 After clone the repository, create a .env file based on .env.example and use your ip address as `BLOCKCHAIN_HOST`.
