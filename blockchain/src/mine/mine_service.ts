@@ -11,6 +11,9 @@ export class MineService {
     this.library = library;
   }
 
+  /*
+    Mineração de blocos
+  */
   mine(): Response {
     const transaction = this.storage.createPendingTransactionsModel().first();
     if (!transaction) {
@@ -42,6 +45,9 @@ export class MineService {
     };
   }
 
+  /*
+    Alcançar o consenso entre os pares da rede
+  */
   consensus() {
     let longestChain = null;
     let currentLen = this.library.createBlockchain().chain.length;
@@ -60,6 +66,9 @@ export class MineService {
     }
   }
 
+  /*
+    Anunciar a inclusão de um novo bloco aos pares da rede
+  */
   announceNewBlock(block: object) {
     if ("created_at" in block) delete block["created_at"];
     const peers = this.storage.createPeersModel().getAll();

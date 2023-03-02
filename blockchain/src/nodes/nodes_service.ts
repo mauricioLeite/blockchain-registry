@@ -7,6 +7,7 @@ import { LibraryFactory } from '../blockchain/libraries/factory/library.factory'
 import { RegistryService } from '../blockchain/src/registry/registry.service';
 import { Block } from '../blockchain/libraries/block/block';
 
+// Classe que lida com comunicação e armazenamento de dados relacionados à blockchain
 export class NodeService {
 
     private storage: DjangoStorageFactory;
@@ -17,6 +18,9 @@ export class NodeService {
         this.library = library;
     }
 
+    /*
+    Verifica se o endereço do novo nó está presente e, em caso afirmativo, adiciona o novo nó ao armazenamento de pares (peers) e retorna a lista de pares atualizada
+    */
     public async newNode(payload: { node_address: string }): Promise<Response> {
         const addr = payload.node_address;
 
@@ -28,6 +32,9 @@ export class NodeService {
         return new RegistryService(this.storage, this.library).list();
     }
 
+    /*
+    Verifica se o endereço do novo nó está presente e, em caso afirmativo, envia uma solicitação POST para o endereço especificado para registrar o novo nó
+    */
     public async joinNetwork(payload: { node_address: string }, host: string): Promise<Response> {
         const addr = payload.node_address;
 
@@ -51,6 +58,9 @@ export class NodeService {
         }
     }
 
+    /*
+    Tenta adicionar um bloco à cadeia de blocos
+    */
     public async syncBlock(block: Block): Promise<Response> {
         const proof = block.hash;
         delete block.id;
@@ -66,6 +76,9 @@ export class NodeService {
         return { message: 'Block added to the chain' }, HttpStatus.CREATED;
     }
 
+    /*
+     Limpa o armazenamento local de pares e blocos
+    */
     public async clearLocal(): Promise<Response> {
         this.storage.createPeersModel().delete();
         this.storage.createBlockModels().delete();
