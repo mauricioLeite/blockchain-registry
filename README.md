@@ -2,7 +2,6 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 Simple Blockchain implementation using as cryptographic proof the Proof-of-Work (PoW) and as consensus the longest valid chain.
-> :warning: The **StrategyModel** needs a reimplementation, for that reason, the application **will not execute** properly.
 
 ## Prerequisites
    - Docker should be installed (version 20.10.17 is used on tests).
