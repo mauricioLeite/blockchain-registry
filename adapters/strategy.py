@@ -1,9 +1,4 @@
-from datetime import datetime
-import logging, json
-
-from django.db.models import F, QuerySet, Model, Count
-
-from typing import Union
+from django.db.models import QuerySet, Model
 
 class StrategyModel():
 
@@ -17,7 +12,7 @@ class StrategyModel():
     def get_all(self):
         blocks = self.model.objects.all().values()
         return list(blocks) if blocks else []
-    
+
     def first(self):
         result =  self.model.objects.first()
         return self.__clean_result(result) if result else result
@@ -45,38 +40,6 @@ class StrategyModel():
         del result['_state']
         return result
 
-    def increment_field(self, where: dict, field: str, increment: int = 1) -> bool:
-        try:
-            self.__evaluate_conditions(where).update(**{field:F(field)+increment})
-            return True
-        except Exception as error:
-            logging.error(json.dumps({"error": str(error)}, ensure_ascii=False))
-            return False
-
-    def decrement_field(self, where: dict, field: str, decrement: int = 1) -> bool:
-        try:
-            self.__evaluate_conditions(where).update(**{field:F(field)-decrement})
-            return True
-        except Exception as error:
-            logging.error(json.dumps({"error": str(error)}, ensure_ascii=False))
-            return False
-
-    def publish(self, where: dict, fields: list = []) -> bool:
-        attrs = {
-            "prod": F("homol"), 
-            "published": 1, 
-            "published_at": datetime.now()
-        }
-        
-        for field in fields:
-            attrs[field] = F(f"{field}_homol")
-            
-        try:
-            return self.__evaluate_conditions(where).update(**attrs)
-        except Exception as error:
-            logging.error(json.dumps({"error": str(error)}, ensure_ascii=False))
-            return False
-
     def __evaluate_conditions(self, where: dict, **kwargs) -> QuerySet:
         where, exclude = self._setup_where(where)
         queryset = self.model.objects.filter(**where)
@@ -85,7 +48,7 @@ class StrategyModel():
         if "order_by" in kwargs:
             queryset = queryset.order_by(kwargs["order_by"])
         return queryset
-    
+
     def _setup_where(self, where: dict) -> dict:
         conditions = {"where":{}, "exclude":{}}
 
@@ -93,7 +56,7 @@ class StrategyModel():
             for key, value in where.items():
                 op = "where"
                 multi_cond = isinstance(value, list) and len(value) > 1 and isinstance(value[0], tuple)
-                
+
                 if multi_cond:
                     for el in value:
                         op, m_key, value = self.__get_operation(key, el)
@@ -104,11 +67,11 @@ class StrategyModel():
                     op, key, value = self.__get_operation(key, value)
 
                 key = f"{key}__in" if isinstance(value, list) and not multi_cond else key
-                
+
                 conditions[op][key] = value
-            
+
         return conditions["where"], conditions["exclude"]
-    
+
     def __get_operation(self, key: str, value: tuple) -> tuple:
         return {
             "!=": ("exclude", key, value[1]),
@@ -122,23 +85,3 @@ class StrategyModel():
             "%=": ("where", f"{key}__icontains", value[1]),
             "null": ("where", f"{key}__isnull", value[1])
         }[value[0]]
-
-    def _query_values(self, queryset: QuerySet, select: list = None, **kwargs):
-        if select or "group_by" in kwargs:
-            select = select if select else kwargs["group_by"]
-            
-            if not isinstance(select, list):
-                select = [select]
-            result = queryset.values(*select)
-
-            if "group_by" in kwargs:
-                result = result.annotate(total=Count(kwargs["group_by"]))
-            return result
-        return queryset.values()
-
-    def __insert_item(self, attrs: dict) -> dict:
-        new_entry = self.model(**attrs)
-        new_entry.save()
-        result = new_entry.__dict__
-        del result['_state']
-        return result
