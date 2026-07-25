@@ -1,5 +1,5 @@
 # Blockchain API
-[![Python 3.8](https://img.shields.io/badge/python-3.8-blue.svg?logo=python&logoColor=white)](https://www.python.org/downloads/release/python-3812/) [![Docker](https://img.shields.io/badge/docker-%232496ED.svg?logo=docker&logoColor=white)](https://www.docker.com/) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Python 3.8](https://img.shields.io/badge/python-3.8-blue.svg?logo=python&logoColor=white)](https://www.python.org/downloads/release/python-3812/) [![Docker 20.10.17](https://img.shields.io/badge/docker-20.10.17-blue.svg?logo=docker&logoColor=white)](https://www.docker.com/) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 Simple Blockchain implementation using as cryptographic proof the Proof-of-Work (PoW) and as consensus the longest valid chain.
 
