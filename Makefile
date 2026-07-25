@@ -58,25 +58,6 @@ down: ## Stop and remove all containers.
 	@docker-compose down \
 		--remove-orphans
 
-DOCKERFILE ?= Dockerfile
-lint-dockerfile: ## Lint any Dockerfile provided using Hadolint.
-	@docker run \
-		--pull always \
-		--rm \
-		--interactive \
-		--volume "${PWD}/.hadolint.yml:/.hadolint.yaml:ro" \
-			hadolint/hadolint:latest < ${DOCKERFILE}
-
-stress-test-build: ## Create container for stress testing
-	@docker-compose \
-		--file docker-compose.yml \
-		--file test/docker-compose.test.yml \
-		build \
-			--progress plain
-
-stress-test: stress-test-build ## Create container for stress testing
-	@docker-compose \
-		--file docker-compose.yml \
-		--file test/docker-compose.test.yml \
-		--compatibility \
-		up
+test: ## Run the Django test suite inside the running container.
+	@docker-compose exec \
+		${CONTAINER} python3 manage.py test
