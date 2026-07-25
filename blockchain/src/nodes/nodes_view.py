@@ -1,5 +1,7 @@
 import json, logging
 
+from django.conf import settings
+from django.http import Http404
 from rest_framework.views import APIView
 
 from adapters.factory import DjangoStorageFactory
@@ -21,11 +23,13 @@ class NewNodeView(APIView):
 class ClearLocalPeers(APIView):
 
     def get(self, request):
+        if not settings.DEBUG:
+            raise Http404()
+
         logging.info(json.dumps({ "class": "ClearLocalPeers" , "message": "Clear request received!" }, ensure_ascii=False))
         return NodeService(storage, library).clear_local()
 
 
-from ...libraries.block import Block
 # Join network based on reference node received
 class JoinView(APIView):
 
@@ -34,15 +38,20 @@ class JoinView(APIView):
         host = request.get_host()
         logging.info(json.dumps({ "class": "JoinView", "payload": payload, "host": host }, ensure_ascii=False))
         return NodeService(storage, library).join_network(payload, host)
-    
+
 """
     Sync new block on chain with another registered nodes
 """
 class BlockSyncView(APIView):
 
     def post(self, request):
-        payload = json.loads(request.data)
+        payload = request.data
         logging.info(json.dumps({ "class": "BlockSync", "payload": payload}, ensure_ascii=False))
         return NodeService(storage, library).sync_block(payload)
-        
-    
+
+
+class ConsensusView(APIView):
+
+    def get(self, request):
+        logging.info(json.dumps({ "class": "ConsensusView" , "message": "Consensus request." }, ensure_ascii=False))
+        return NodeService(storage, library).consensus()

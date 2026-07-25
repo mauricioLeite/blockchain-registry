@@ -3,15 +3,16 @@ from django.urls import path
 from blockchain.src.registry.registry_view import RegistryView
 from blockchain.src.transactions.transactions_view import  TransactionsView
 from blockchain.src.mine.mine_view import MineView
-from blockchain.src.nodes.nodes_view import NewNodeView, JoinView, BlockSyncView, ClearLocalPeers
+from blockchain.src.nodes.nodes_view import NewNodeView, JoinView, BlockSyncView, ClearLocalPeers, ConsensusView
 
 urlpatterns = [
     path("registry/", RegistryView.as_view()),
     path("registry/<int:id_>", RegistryView.as_view()),
 
     path("transaction/", TransactionsView.as_view()),
-    
+
     path("mine/", MineView.as_view()),
+    path("consensus/", ConsensusView.as_view()),
 
     path("node/register", NewNodeView.as_view()),
     path("node/join", JoinView.as_view()),
