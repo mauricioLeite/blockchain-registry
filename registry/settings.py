@@ -13,29 +13,37 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 from pathlib import Path
 from os import environ
 
+from django.core.exceptions import ImproperlyConfigured
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-# Updating logging output format
-import logging
-logging.basicConfig(level=logging.INFO, format='{"level":"%(levelname)s", "file":"%(module)s", "method":"%(funcName)s", "infos":%(message)s}') 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-2wuu887$ejg7r@=n!nx463b+-ej)_w_si0*#%t8c9er8wu)@p$'
+ENVIRONMENT = environ.get('ENVIRONMENT')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False if environ['ENVIRONMENT'] == 'production' else True
+DEBUG = ENVIRONMENT != 'production'
 
-ALLOWED_HOSTS = [environ["BLOCKCHAIN_HOST"]]
+SECRET_KEY = environ.get('SECRET_KEY')
+if not SECRET_KEY:
+    raise ImproperlyConfigured(
+        "SECRET_KEY environment variable is required."
+    )
+
+# Comma-separated so a single node can be reachable under more than one name at once
+# A single-value setting made it impossible to reach a node both ways.
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in environ.get('BLOCKCHAIN_HOST', 'localhost').split(',')
+    if host.strip()
+]
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -135,4 +143,24 @@ REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [
         'rest_framework.renderers.JSONRenderer',
     ],
+}
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'json': {
+            '()': 'registry.logging_formatters.JSONLogFormatter',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'json',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
 }
